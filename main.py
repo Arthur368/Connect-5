@@ -9,10 +9,5 @@ pg.display.set_caption("Gomoku(Five in a row)")
 
 gm = Game_manager()
 
-    
-for event in pg.event.get():
-
-    if event.type == pg.QUIT:
-        pg.quit()
-
-    pg.display.update()
+while True:
+    gm.tick()
