@@ -4,6 +4,7 @@ from typing import Optional
 from xmlrpc.client import Boolean
 import pygame as pg
 from pygame.locals import *
+from pygame import mixer
 import numpy as np
 import re
 
@@ -63,7 +64,13 @@ class Board(Game_object):
 
         #print(rows)
 
-        is_terminal = self.is_five_in_a_row(rows) or self.is_five_in_a_row(cols)
+        diags = ["".join(self.state.diagonal(i)) for i in range(-14, 15)]
+
+        state_filped = np.fliplr(self.state)
+
+        diags.extend(["".join(state_filped.diagonal(i)) for i in range(-14, 15)])
+
+        is_terminal = self.is_five_in_a_row(rows) or self.is_five_in_a_row(cols) or self.is_five_in_a_row(diags)
 
         return is_terminal
 
