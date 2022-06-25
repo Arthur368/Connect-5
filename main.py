@@ -1,4 +1,3 @@
-import imp
 import pygame as pg
 from pygame.locals import *
 from game_manager import Game_manager
@@ -14,7 +13,7 @@ pg.display.set_icon(title_icon)
 
 # background music
 mixer.music.load("Sound/background.mp3")
-mixer.music.play(-1) # loop 
+mixer.music.play(-1) # loop
 
 gm = Game_manager()
 

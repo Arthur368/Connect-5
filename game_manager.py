@@ -1,7 +1,5 @@
-from more_itertools import sample
 import pygame as pg
 from pygame.locals import *
-import pygments
 from game_object import *
 from enum import Enum
 
