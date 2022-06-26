@@ -61,7 +61,6 @@ class Board(Game_object):
         """
         seems there is a little bit weird about which one is row and which one is col
         """
-
         #print(rows)
 
         diags = ["".join(self.state.diagonal(i)) for i in range(-14, 15)]
@@ -73,6 +72,7 @@ class Board(Game_object):
         is_terminal = self.is_five_in_a_row(rows) or self.is_five_in_a_row(cols) or self.is_five_in_a_row(diags)
 
         return is_terminal
+
 
 
 
