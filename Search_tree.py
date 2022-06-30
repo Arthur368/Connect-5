@@ -102,6 +102,23 @@ class Node:
         
         return five_in_a_row > 0
 
+    # Too much successors for a node, we only need to search places 
+    def get_searchable_places(self):
+        
+        matrix_state = [[1 if (0 < i < 16 and 0 < j < 16 and self.state[i - 1, j - 1] != "n") else 0 for j in range(17)] for i in range(17)]
+
+        matrix_state = np.asarray(matrix_state)
+
+        kernal = np.ones((3, 3))
+        kernal[1][1] = 10
+
+       # check if searchable
+        is_searchable = [[True if matrix_state[i+1][j+1] == 0 and matrix_state[i: i + 3, j: j + 3].sum() > 0 else False for j in range(15)] for i in range(15)]
+
+        searchable_places = [(i, j) for i in range(15) for j in range(15) if is_searchable[i][j]]
+
+        return searchable_places
+
 class Game_Tree:
 
     def __init__(self, root) -> None:
@@ -112,26 +129,29 @@ class Game_Tree:
 
         if current_depth < max_depth and not self.root.is_terminal:
 
-            state = deepcopy(self.root.state)
+            searchable_places = self.root.get_searchable_places()
 
-            # loop over and find all possible places for pieces.
-            for i in range(len(state)):
+            state_c = deepcopy(self.root.state)
+            
+            if len(searchable_places) == 0:
+                return
+            # loop over and find all possible places for pieces
+            for pos in searchable_places:
 
-                for j in range(len(state[0])):
 
-                    if state[i][j] == "n":
-                        
-                        state[i][j] = self.root.player[0]
-                        child = Node(state, self.root.opponent)
-                        child.set_newest_pos((i, j)) # for return best move
+                if state_c[pos[0]][pos[1]] == "n":
+                    
+                    state_c[pos[0]][pos[1]] = self.root.player[0]
+                    child = Node(state_c, self.root.opponent)
+                    child.set_newest_pos((pos[0], pos[1])) # for return best move
 
-                        self.root.add_child(child)
-                        child.set_parent(self.root)
+                    self.root.add_child(child)
+                    child.set_parent(self.root)
 
-                        subtree = Game_Tree(child)
-                        subtree.generate_game_tree(current_depth + 1, max_depth)
+                    subtree = Game_Tree(child)
+                    subtree.generate_game_tree(current_depth + 1, max_depth)
 
-                        state[i][j] = "n" # need to change board back before next iteration.
+                    state_c[pos[0]][pos[1]] = "n" # need to change board back before next iteration.
 
 
     def evaluate_game_tree(self) -> int:
@@ -179,6 +199,10 @@ class Game_Tree:
         return self.root.bound
 
     def choose(self):
+
+        if len(self.root.children) == 0:
+
+            return (7, 7)
         
         best_move = (-1, -1)
         best_value = 0.5
@@ -248,9 +272,10 @@ if __name__ == '__main__':
     board = np.empty((15, 15), dtype = str)
     board[:] = "n"
     #board[0][1:6] = "b"
-    #board[3][3:5] = "w"
+    board[3][3] = "w"
+    board[4][3] = "b"
     
-    print(connect_four_ab(board, "black", 1))
+    print(connect_four_ab(board, "black", 3))
     
 
     
