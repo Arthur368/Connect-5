@@ -62,8 +62,8 @@ class Node:
     def evaluation(self) -> None:
 
         self.eval = self.score("black") - self.score("white")
+        self.bound = self.eval
     
-
     def score(self, player: str) -> int:
 
         p = player[0]
@@ -121,10 +121,8 @@ class Game_Tree:
 
                     if state[i][j] == "n":
                         
-                        #print(self.root.opponent)
                         state[i][j] = self.root.player[0]
                         child = Node(state, self.root.opponent)
-                        #print(child.opponent == "")
                         child.set_newest_pos((i, j)) # for return best move
 
                         self.root.add_child(child)
@@ -152,7 +150,7 @@ class Game_Tree:
 
                     if len(child.children) == 0:
                         
-                        evals.append(Game_Tree(child).evaluate_game_tree())
+                       self.root.bound = Game_Tree(child).evaluate_game_tree()
                     
                     else:
                 
@@ -160,31 +158,25 @@ class Game_Tree:
 
                         if child.player == "black":
                             
-                            evals.append(max(evals_for_child))
-
+                            self.root.bound = max(evals_for_child)
                         else:   
                             
-                            evals.append(min(evals_for_child))
+                            self.root.bound = min(evals_for_child)
 
-                     # keep bounds not exact values for the sake of pruning.
 
-                    self.root.bound = evals[0]
                 
                 else:
                     # condition for pruning
-                    if self.root.parent != None and ((self.root.player == "black" and self.root.parent.bound <= self.root.bound) or (self.root.player == "white" and self.root.parent.bound >= self.root.bound)):
+                    if self.root.parent != None and ((self.root.player == "black" and self.root.parent.bound >= self.root.bound) or (self.root.player == "white" and self.root.parent.bound <= self.root.bound)):
                         break
                     
                     child_value = Game_Tree(child).evaluate_game_tree()
 
-                    evals.append(Game_Tree(child).evaluate_game_tree())
-                    
-            if self.root.player == "black":
-                self.root.eval = max(evals)
-            else:
-                self.root.eval = min(evals)
+                    if (self.root.player == "black" and child_value > self.root.bound) or (self.root.player == "white" and child_value < self.root.bound):
 
-        return self.root.eval
+                        self.root.bound = child_value
+
+        return self.root.bound
 
     def choose(self):
         
@@ -193,15 +185,16 @@ class Game_Tree:
 
         for child in self.root.children:
             
+
             if best_value == 0.5:
                
-                best_value = child.eval
+                best_value = child.bound
                 best_move = child.newest_pos
             else:
                 
-                if (self.root.player == "black" and child.eval > best_value) or (self.root.player == "white" and child.eval < best_value):
+                if (self.root.player == "black" and child.bound > best_value) or (self.root.player == "white" and child.bound < best_value):
 
-                    best_value = child.eval
+                    best_value = child.bound
                     best_move = child.newest_pos
 
         return best_move
@@ -257,7 +250,7 @@ if __name__ == '__main__':
     #board[0][1:6] = "b"
     #board[3][3:5] = "w"
     
-    print(connect_four_ab(board, "black", 2))
+    print(connect_four_ab(board, "black", 1))
     
 
     
