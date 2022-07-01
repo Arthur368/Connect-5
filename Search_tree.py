@@ -121,11 +121,22 @@ class Node:
 
 class Game_Tree:
 
-    def __init__(self, root) -> None:
+    def __init__(self, root: Node) -> None:
         self.root = root
         self.evaluated_node_size = 0
 
     def generate_game_tree(self, current_depth, max_depth):
+
+        if self.root.is_terminal:
+
+            if self.root.player == "black":
+
+                # when white wins
+                self.bound = -1000000
+            else:
+                self.bound = 1000000
+
+            return
 
         if current_depth < max_depth and not self.root.is_terminal:
 
