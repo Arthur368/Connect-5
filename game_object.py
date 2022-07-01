@@ -40,7 +40,7 @@ class Board(Game_object):
         if self.board_for_display[row][col] == None:
 
             self.board_for_display[row][col] = Piece(43 + (row - 1/2)*(244/7), 73 + (col - 1/2)*(244/7), "Images/{}_piece.png".format(color), 244/7, 244/7, color)
-            self.state[row][col] = color[0]
+            self.state[row][col] = color[0] # update state
 
     def is_five_in_a_row(self, rows: list) -> Boolean:
 
