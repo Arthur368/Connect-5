@@ -34,16 +34,18 @@ class Game_manager:
 
     def add_piece_to_board(self, row, col):
 
-        self.current_board.add_piece(row, col, self.turn) # turn is the same as color and type of a piece
+        if self.current_board.state[row][col] == "n":
 
-        sound = mixer.Sound("Sound/sound_effect.wav")
-        sound.play() # sound when a player place a piece
+            self.current_board.add_piece(row, col, self.turn) # turn is the same as color and type of a piece
 
-        if not self.current_board.is_terminal():
-            self.change_turn()
-        else:
-            self.winner = self.turn
-            self.page = Game_pages.END_PAGE # switch to end page
+            sound = mixer.Sound("Sound/sound_effect.wav")
+            sound.play() # sound when a player place a piece
+
+            if not self.current_board.is_terminal():
+                self.change_turn()
+            else:
+                self.winner = self.turn
+                self.page = Game_pages.END_PAGE # switch to end page
 
     def show_text(self, font:str, text: str, size: int, color: str, x: float, y: float) -> None:
 
@@ -56,7 +58,7 @@ class Game_manager:
         
         self.show_text("calibri", "GOMOKU", 72, "black", 259.5, 150)
         self.show_text("calibri", "Multi Player(m)", 40, "black", 50, 450)
-        self.show_text("calibri", "Single Player(s)", 40, "black", 240, 450)
+        self.show_text("calibri", "Single Player(s)", 40, "black", 350, 450)
         self.show_text("calibri", "Press m or s to start", 36, "black", 250, 300)
 
 
