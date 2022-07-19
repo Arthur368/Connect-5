@@ -73,7 +73,7 @@ class Game_manager:
             for piece in row:
                 if piece != None:
                     piece.draw(self.screen)
-    
+            
     def end_page(self) -> None:
 
         self.show_text("calibri", "{} wins".format(self.winner), 144, "black", 76, 100)
@@ -131,8 +131,8 @@ class Game_manager:
                     root = Node(self.current_board.state, self.turn)
 
                     tree = Game_Tree(root)
-                    tree.generate_game_tree(0, 3) # max depth equals 3 for now
-                    tree.evaluate_game_tree()
+                    tree.generate_game_tree(0, 4) # max depth equals 3 for now
+                    #tree.evaluate_game_tree()
 
                     action = tree.choose()
 

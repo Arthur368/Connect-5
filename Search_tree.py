@@ -66,7 +66,7 @@ class Node:
 
         self.eval = self.score("black") - self.score("white")
         self.bound = self.eval
-    
+
     def score(self, player: str) -> int:
 
         p = player[0]
@@ -145,18 +145,27 @@ class Game_Tree:
         if current_depth == max_depth:
 
             self.root.evaluation()
+            
 
         if current_depth < max_depth and not self.root.is_terminal:
 
             searchable_places = self.root.get_searchable_places()
 
             state_c = deepcopy(self.root.state)
+
+            def get_eval(pos: tuple) -> int:
+                state_c = deepcopy(self.root.state)
+                state_c[pos[0]][pos[1]] = self.root.player[0]
+                child = Node(state_c, self.root.opponent)
+                return child.score("black") - child.score("white")
+
+            if current_depth == 0:
+                searchable_places = sorted(searchable_places, key = get_eval, reverse = (self.root.player == "black"))
             
             if len(searchable_places) == 0:
                 return
             # loop over and find all possible places for pieces
             for pos in searchable_places:
-
 
                 if state_c[pos[0]][pos[1]] == "n":
                     
@@ -176,7 +185,9 @@ class Game_Tree:
                     if (self.root.player == "black" and child.bound > self.root.bound) or (self.root.player == "white" and child.bound < self.root.bound):
                         self.root.bound = child.bound
 
+                    # nodes that possible for pruning
                     if not self.root.is_first_child() and self.root.parent:
+                        # alpha & beta pruning condition checking
                         if ((self.root.player == "black" and self.root.parent.bound >= self.root.bound) or (self.root.player == "white" and self.root.parent.bound <= self.root.bound)):
                             break
 
