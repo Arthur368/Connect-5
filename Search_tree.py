@@ -58,6 +58,9 @@ class Node:
 
     def set_newest_pos(self, pos: tuple) -> None:
         self.newest_pos = pos
+    
+    def is_first_child(self) -> bool:
+        return self.parent and self.parent.children.index(self) == 0
 
     def evaluation(self) -> None:
 
@@ -125,6 +128,7 @@ class Game_Tree:
         self.root = root
         self.evaluated_node_size = 0
 
+    # to save the time, one way is to combine generation and evaluation together.
     def generate_game_tree(self, current_depth, max_depth):
 
         if self.root.is_terminal:
@@ -137,6 +141,10 @@ class Game_Tree:
                 self.bound = 1000000
 
             return
+
+        if current_depth == max_depth:
+
+            self.root.evaluation()
 
         if current_depth < max_depth and not self.root.is_terminal:
 
@@ -164,50 +172,13 @@ class Game_Tree:
 
                     state_c[pos[0]][pos[1]] = "n" # need to change board back before next iteration.
 
+                    # update bound info
+                    if (self.root.player == "black" and child.bound > self.root.bound) or (self.root.player == "white" and child.bound < self.root.bound):
+                        self.root.bound = child.bound
 
-    def evaluate_game_tree(self) -> int:
-
-        if len(self.root.children) == 0: # leaf node, need to be evaluated
-            
-            self.root.evaluation()
-
-        else:
-            
-            evals = []
-
-            for child in self.root.children:
-
-                if self.root.children.index(child) == 0: # we have to evaluate every thing for first child so we get something to compare.
-
-                    if len(child.children) == 0:
-                        
-                       self.root.bound = Game_Tree(child).evaluate_game_tree()
-                    
-                    else:
-                
-                        evals_for_child = [Game_Tree(grandchild).evaluate_game_tree() for grandchild in child.children]
-
-                        if child.player == "black":
-                            
-                            self.root.bound = max(evals_for_child)
-                        else:   
-                            
-                            self.root.bound = min(evals_for_child)
-
-
-                
-                else:
-                    # condition for pruning
-                    if self.root.parent != None and ((self.root.player == "black" and self.root.parent.bound >= self.root.bound) or (self.root.player == "white" and self.root.parent.bound <= self.root.bound)):
-                        break
-                    
-                    child_value = Game_Tree(child).evaluate_game_tree()
-
-                    if (self.root.player == "black" and child_value > self.root.bound) or (self.root.player == "white" and child_value < self.root.bound):
-
-                        self.root.bound = child_value
-
-        return self.root.bound
+                    if not self.root.is_first_child() and self.root.parent:
+                        if ((self.root.player == "black" and self.root.parent.bound >= self.root.bound) or (self.root.player == "white" and self.root.parent.bound <= self.root.bound)):
+                            break
 
     def choose(self):
 
@@ -220,7 +191,6 @@ class Game_Tree:
 
         for child in self.root.children:
             
-
             if best_value == 0.5:
                
                 best_value = child.bound
@@ -265,8 +235,6 @@ def connect_four_ab(contents, turn, max_depth):
 
     game_tree.generate_game_tree(0, int(max_depth))
 
-    game_tree.evaluate_game_tree()
-
     action = game_tree.choose()
     
     #game_tree.evaluated_node_size += game_tree.count_evaluated_nodes()
@@ -286,7 +254,7 @@ if __name__ == '__main__':
     board[3][3] = "w"
     board[4][3] = "b"
     
-    print(connect_four_ab(board, "black", 3))
+    print(connect_four_ab(board, "black", 4))
     
 
     
